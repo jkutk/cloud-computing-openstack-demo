@@ -1,0 +1,11 @@
+#!/bin/bash
+
+export OS_AUTH_URL=http://localhost:5000/v2.0
+export OS_TENANT_ID=902534c865ef4ec581121d6e7417e1fe
+export OS_TENANT_NAME=admin
+export OS_USERNAME=matthias
+
+echo "Please enter your OpenStack Password: "
+read -s OS_PASSWORD_INPUT
+export OS_PASSWORD=$OS_PASSWORD_INPUT
+
