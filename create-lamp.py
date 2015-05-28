@@ -2,7 +2,7 @@
 
 import time
 
-from novaclient.v1_1 import client
+from novaclient.v2 import client
 from credentials import get_nova_creds
 creds = get_nova_creds()
 nova = client.Client(**creds)
@@ -19,7 +19,7 @@ for cur_keypair in avail_keypairs:
 
 # Upload ssh keypair if necessary
 if keypair is None:
-	f = open('/root/demo/ssh_key.pub','r')
+	f = open('/Users/matthias/Documents/workspace-bigdatadude/vagrant-base/files/ssh_keys/root.key.pub','r')
 	publickey = f.readline()[:-1]
 	keypair = nova.keypairs.create('matthias-demo-key',publickey)
 	f.close()
@@ -27,7 +27,7 @@ if keypair is None:
 # Check the list of floating ips
 ips = nova.floating_ips.list()
 for cur_ip in ips:
-	if cur_ip.ip == '140.78.92.56':
+	if cur_ip.ip == '140.78.92.57':
 		ip = cur_ip
 
 # Check if our ip is alredy used
@@ -36,7 +36,7 @@ if not ip.instance_id is None:
 	raise Error('IP ' + ip.ip + ' alredy in use')
 
 # Find the network we are using for our instances
-network = nova.networks.find(label='herb-net')
+network = nova.networks.find(label='private')
 nics = [{'net-id': network.id}]
 
 # Find the security groups we are using
@@ -56,7 +56,7 @@ if sg_ssh is None or sg_https is None:
 flavor = nova.flavors.find(name='m1.medium')
 
 # MySQL image
-dbimage = nova.images.find(name='Debian 7.7 Backports MySQL Server')
+dbimage = nova.images.find(name='CentOS 6.6 64bit Puppet')
 
 # Create DB server
 dbserver = nova.servers.create(name = 'demo-mysql-db',
@@ -71,13 +71,13 @@ while True:
 	time.sleep(5)
 	if dbserver.status == 'ACTIVE':
 		break
-dbserverip = dbserver.addresses['herb-net'][0]['addr']
+dbserverip = dbserver.addresses['private'][0]['addr']
 
 # Meta data for webserver
 meta = {'dbserverip': dbserverip}
 
 # Web Server
-webimage = nova.images.find(name='Debian 7.7 Backports Apache2 phpMyAdmin Server')
+webimage = nova.images.find(name='CentOS 6.6 64bit Puppet')
 
 # Create Web Server
 webserver = nova.servers.create(name = 'demo-apache',
